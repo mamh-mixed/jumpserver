@@ -4,6 +4,8 @@ import urllib.parse
 import json
 import base64
 from typing import Callable
+from Cryptodome.Cipher import AES
+import base64
 
 from django.conf import settings
 from django.core.cache import cache
@@ -17,6 +19,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import serializers
 
+from applications.models import Application
 from authentication.signals import post_auth_failed, post_auth_success
 from common.utils import get_logger, random_string
 from common.mixins.api import SerializerMixin
@@ -117,12 +120,14 @@ class ClientProtocolMixin:
             name = asset.hostname
         elif application:
             name = application.name
-            app = f'||{application.type}'
+            application.get_rdp_remote_app_setting()
+
+            app = f'||jmservisor'
             options['remoteapplicationmode:i'] = '1'
             options['alternate shell:s'] = app
             options['remoteapplicationprogram:s'] = app
             options['remoteapplicationname:s'] = 'Google Chrome'
-            options['remoteapplicationcmdline:s'] = ''
+            options['remoteapplicationcmdline:s'] = b'- ' + self.get_encrypt_cmdline(application)
         else:
             name = '*'
 
@@ -130,6 +135,19 @@ class ClientProtocolMixin:
         for k, v in options.items():
             content += f'{k}:{v}\n'
         return name, content
+
+    def get_encrypt_cmdline(self, app: Application):
+        parameters = app.get_rdp_remote_app_setting()['parameters']
+
+        def to16(src):
+            digit = len(src) % 16
+            if digit:
+                return src + b'\0' * (16 - digit)
+            return src
+
+        aes = AES.new(to16(settings.SECRET_KEY[:16]), AES.MODE_ECB)
+        v = aes.encrypt(to16(parameters))
+        return base64.standard_b64encode(v)
 
     @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file', permission_classes=[IsValidUser])
     def get_rdp_file(self, request, *args, **kwargs):
