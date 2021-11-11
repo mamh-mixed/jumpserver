@@ -127,7 +127,7 @@ class ClientProtocolMixin:
             options['alternate shell:s'] = app
             options['remoteapplicationprogram:s'] = app
             options['remoteapplicationname:s'] = 'Google Chrome'
-            options['remoteapplicationcmdline:s'] = b'- ' + self.get_encrypt_cmdline(application)
+            options['remoteapplicationcmdline:s'] = '- ' + self.get_encrypt_cmdline(application).decode('ascii')
         else:
             name = '*'
 
@@ -138,6 +138,7 @@ class ClientProtocolMixin:
 
     def get_encrypt_cmdline(self, app: Application):
         parameters = app.get_rdp_remote_app_setting()['parameters']
+        parameters = parameters.encode('ascii')
 
         def to16(src):
             digit = len(src) % 16
@@ -145,7 +146,8 @@ class ClientProtocolMixin:
                 return src + b'\0' * (16 - digit)
             return src
 
-        aes = AES.new(to16(settings.SECRET_KEY[:16]), AES.MODE_ECB)
+        key = settings.SECRET_KEY.encode('ascii')
+        aes = AES.new(to16(key[:16]), AES.MODE_ECB)
         v = aes.encrypt(to16(parameters))
         return base64.standard_b64encode(v)
 
