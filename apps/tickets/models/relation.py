@@ -7,6 +7,11 @@ class TicketSession(models.Model):
     session = models.ForeignKey('terminal.Session', related_name='ticket_relation', on_delete=models.CASCADE, db_constraint=False)
 
     class Meta:
+        default_permissions = []
+        permissions = [
+            ('view_ticketsession', _('Can view ticket session')),
+            ('add_ticketsession', _('Can add ticket session')),
+        ]
         verbose_name = _("Ticket session relation")
 
     @classmethod

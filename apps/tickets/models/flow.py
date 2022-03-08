@@ -30,6 +30,7 @@ class ApprovalRule(CommonModelMixin):
     )
 
     class Meta:
+        default_permissions = []
         verbose_name = _('Ticket flow approval rule')
 
     def __str__(self):
@@ -63,6 +64,11 @@ class TicketFlow(CommonModelMixin, OrgModelMixin):
     rules = models.ManyToManyField(ApprovalRule, related_name='ticket_flows')
 
     class Meta:
+        default_permissions = []
+        permissions = [
+            ('view_ticketflow', _('Can view ticket flow')),
+            ('change_ticketflow', _('Can change ticket flow')),
+        ]
         verbose_name = _('Ticket flow')
 
     def __str__(self):

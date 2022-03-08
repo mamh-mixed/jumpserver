@@ -59,7 +59,6 @@ exclude_permissions = (
     ('audits', 'passwordchangelog', 'add,change,delete', 'passwordchangelog'),
     ('audits', 'userloginlog', 'change,delete,change', 'userloginlog'),
     ('audits', 'ftplog', 'change,delete', 'ftplog'),
-    ('tickets', 'ticket', '*', '*'),
     ('xpack', 'interface', '*', '*'),
     ('xpack', 'license', '*', '*'),
     ('common', 'permission', 'add,delete,view,change', 'permission'),
@@ -68,6 +67,8 @@ exclude_permissions = (
     ('terminal', 'sessionreplay', 'delete', 'sessionreplay'),
     ('terminal', 'session', 'delete', 'session'),
     ('terminal', 'session', 'delete,change', 'command'),
+    ('terminal', 'task', 'delete', 'task'),
+    ('terminal', 'status', 'delete,add', 'status'),
 )
 
 

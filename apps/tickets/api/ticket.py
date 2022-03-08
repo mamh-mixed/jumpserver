@@ -34,6 +34,10 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         'date_created', 'serial_num',
     )
     ordering = ('-date_created',)
+    rbac_permissions = {
+        'GET': 'tickets.view_ticket',
+        'open': 'tickets.add_ticket',
+    }
 
     def create(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)

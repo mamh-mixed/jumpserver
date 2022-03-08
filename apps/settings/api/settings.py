@@ -41,6 +41,48 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'tencent': serializers.TencentSMSSettingSerializer,
     }
 
+    category_perms = {
+        # 基本设置
+        'basic': 'settings.change_basic',
+        # 邮件设置
+        'email': 'settings.change_email',
+        'email_content': 'settings.change_email',
+        # 认证设置
+        'auth': 'settings.change_auth',
+        'ldap': 'settings.change_auth',
+        'wecom': 'settings.change_auth',
+        'dingtalk': 'settings.change_auth',
+        'feishu': 'settings.change_auth',
+        'oidc': 'settings.change_auth',
+        'keycloak': 'settings.change_auth',
+        'radius': 'settings.change_auth',
+        'cas': 'settings.change_auth',
+        'sso': 'settings.change_auth',
+        'saml2': 'settings.change_auth',
+        # 消息订阅
+        # 短信设置
+        'sms': 'settings.change_sms',
+        'alibaba': 'settings.change_sms',
+        'tencent': 'settings.change_sms',
+        # 终端设置
+        'terminal': 'settings.change_terminal_setting',
+        # 安全设置
+        'security': 'settings.change_security',
+        # 定期清理
+        'clean': 'settings.change_clean',
+        # 组织管理
+        # 其他设置
+        'other': 'settings.change_other',
+        # 许可证
+    }
+
+    def check_permissions(self, request):
+        category = request.query_params.get('category', 'basic')
+        require_perms = self.category_perms.get(category)
+        if not request.user.has_perms(require_perms):
+            self.permission_denied(request)
+        return super().check_permissions(request)
+
     def get_queryset(self):
         return Setting.objects.all()
 

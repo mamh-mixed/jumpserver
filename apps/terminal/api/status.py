@@ -24,6 +24,9 @@ class StatusViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.StatusSerializer
     session_serializer_class = serializers.SessionSerializer
     task_serializer_class = serializers.TaskSerializer
+    rbac_perms = {
+        'create': 'terminal.change_status'
+    }
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

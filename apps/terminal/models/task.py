@@ -23,5 +23,5 @@ class Task(models.Model):
 
     class Meta:
         db_table = "terminal_task"
-        verbose_name = _("Task")
+        verbose_name = _("Terminal task")
 

@@ -96,6 +96,7 @@ special_pid_mapper = {
 verbose_name_mapper = {
     'orgs.organization': _("App organizations"),
     'tickets.comment': _("Ticket comment"),
+    'terminal.terminal': _('Terminals'),
 }
 
 xpack_nodes = [
@@ -244,7 +245,7 @@ class PermissionTreeUtil:
             name += content_types_name_mapper[ct]
         else:
             name = gettext(p.name)
-            name = name.replace('Can ', '').replace('可以', '')
+            name = name.replace('Can ', '').replace('可以', '').replace('管理', '')
         return name
 
     def _create_perms_nodes(self):

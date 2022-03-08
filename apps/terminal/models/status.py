@@ -30,7 +30,7 @@ class Status(models.Model):
     class Meta:
         db_table = 'terminal_status'
         get_latest_by = 'date_created'
-        verbose_name = _("Status")
+        verbose_name = _("Terminal status")
 
     def save_to_cache(self):
         if not self.terminal:

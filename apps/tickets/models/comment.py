@@ -20,6 +20,11 @@ class Comment(CommonModelMixin):
     body = models.TextField(verbose_name=_("Body"))
 
     class Meta:
+        default_permissions = []
+        permissions = [
+            ('view_comment', _('Can view comment')),
+            ('add_comment', _('Can add comment'))
+        ]
         ordering = ('date_created', )
         verbose_name = _("Comment")
 

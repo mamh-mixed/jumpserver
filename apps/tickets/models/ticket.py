@@ -32,6 +32,7 @@ class TicketStep(CommonModelMixin):
     state = models.CharField(choices=ProcessStatus.choices, max_length=64, default=ProcessStatus.notified)
 
     class Meta:
+        default_permissions = []
         verbose_name = _("Ticket step")
 
 
@@ -43,6 +44,7 @@ class TicketAssignee(CommonModelMixin):
     step = models.ForeignKey('tickets.TicketStep', related_name='ticket_assignees', on_delete=models.CASCADE)
 
     class Meta:
+        default_permissions = []
         verbose_name = _('Ticket assignee')
 
     def __str__(self):
@@ -159,6 +161,11 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
     serial_num = models.CharField(max_length=128, unique=True, null=True, verbose_name=_('Serial number'))
 
     class Meta:
+        default_permissions = []
+        permissions = {
+            ('view_ticket', _('Can view ticket')),
+            ('add_ticket', _('Can add ticket'))
+        }
         ordering = ('-date_created',)
         verbose_name = _('Ticket')
 
@@ -315,5 +322,12 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
 
 class SuperTicket(Ticket):
     class Meta:
+        default_permissions = []
+        permissions = [
+            # 登录资产校验、命令复核校验时会自动创建复核工单
+            ('add_superticket', _('Can add super ticket')),
+            ('view_superticket', _('Can view super ticket')),
+            ('change_superticket', _('Can change super ticket')),
+        ]
         proxy = True
         verbose_name = _("Super ticket")
