@@ -364,6 +364,7 @@ class UserConnectionTokenViewSet(
         perm_required = 'authentication.add_superconnectiontoken'
         if user != self.request.user and not self.request.user.has_perm(perm_required):
             raise PermissionDenied('Only can create user token')
+
         self.check_resource_permission(user, asset, application, system_user)
         token = random_string(36)
         secret = random_string(16)

@@ -32,8 +32,12 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
         'login_url': SSOTokenSerializer,
         'login': EmptySerializer
     }
+    rbac_perms = {
+        'login_url': 'authentication.add_ssotoken',
+        'login': '',
+    }
 
-    @action(methods=[POST], detail=False, permission_classes=[OnlySuperUser], url_path='login-url')
+    @action(methods=[POST], detail=False, url_path='login-url')
     def login_url(self, request, *args, **kwargs):
         if not settings.AUTH_SSO:
             raise SSOAuthClosed()
@@ -55,7 +59,7 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
         login_url = '%s?%s' % (reverse('api-auth:sso-login', external=True), urlencode(query))
         return Response(data={'login_url': login_url})
 
-    @action(methods=[GET], detail=False, filter_backends=[AuthKeyQueryDeclaration], permission_classes=[AllowAny])
+    @action(methods=[GET], detail=False, filter_backends=[AuthKeyQueryDeclaration])
     def login(self, request: Request, *args, **kwargs):
         """
         此接口违反了 `Restful` 的规范

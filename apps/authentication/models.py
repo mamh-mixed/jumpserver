@@ -30,7 +30,7 @@ class AccessKey(models.Model):
         return str(self.id)
 
     class Meta:
-        verbose_name = _("Access key")
+        verbose_name = _("API key")
 
 
 class PrivateToken(Token):
@@ -50,6 +50,10 @@ class SSOToken(models.JMSBaseModel):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'), db_constraint=False)
 
     class Meta:
+        default_permissions = []
+        permissions = [
+            ('add_ssotoken', _('Can add sso token'))
+        ]
         verbose_name = _('SSO token')
 
 
@@ -58,10 +62,21 @@ class ConnectionToken(models.JMSBaseModel):
     # Todo: add connection token 可能要授权给 普通用户, 或者放开就行
 
     class Meta:
+        default_permissions = []
+        permissions = [
+            ('add_connectiontoken', _('Can add connection token')),
+            ('view_connectiontoken', _('Can view connection token')),
+            ('view_connectiontokensecret', _('Can view connection token secret')),
+        ]
         verbose_name = _('Connection token')
 
 
 class SuperConnectionToken(ConnectionToken):
     class Meta:
         proxy = True
+        default_permissions = []
+        permissions = [
+            ('add_superconnectiontoken', _('Can add super connection token')),
+            ('view_superconnectiontoken', _('Can view super connection token')),
+        ]
         verbose_name = _("Super connection token")

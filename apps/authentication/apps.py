@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 class AuthenticationConfig(AppConfig):
     name = 'authentication'
-    verbose_name = _('Authentication')
+    verbose_name = _('User authentication')
 
     def ready(self):
         from . import signal_handlers
