@@ -52,6 +52,7 @@ def delete_unused_permissions(apps, schema_editor):
         ('settings', 'setting', 'delete_setting'),
         ('settings', 'setting', 'view_setting'),
         ('settings', 'setting', 'change_terminal'),
+        ('settings', 'setting', 'change_terminal_setting'),
     ]
     for app, model, codename in permissions_delete_required:
         permission_model.objects.filter(

@@ -77,8 +77,9 @@ special_pid_mapper = {
     "assets.gathereduser": "gather_account_node",
     'xpack.gatherusertask': 'gather_account_node',
     'xpack.gatherusertaskexecution': 'gather_account_node',
+    'xpack.license': 'view_setting',
+    'xpack.interface': 'view_setting',
     'orgs.organization': 'view_setting',
-    'settings.setting': 'view_setting',
     'terminal.terminal': 'terminal_node',
     'terminal.commandstorage': 'terminal_node',
     'terminal.replaystorage': 'terminal_node',
@@ -91,6 +92,14 @@ special_pid_mapper = {
     'perms.view_myapps': 'my_apps',
     'perms.connect_myapps': 'my_apps',
     'ops.commandexecution': 'view_workspace',
+    'settings.change_basic': 'view_setting',
+    'settings.change_email': 'view_setting',
+    'settings.change_auth': 'view_setting',
+    'settings.change_sms': 'view_setting',
+    'settings.change_security': 'view_setting',
+    'settings.change_clean': 'view_setting',
+    'settings.change_other': 'view_setting',
+    'settings.change_terminal_setting': 'terminal_node',
 }
 
 verbose_name_mapper = {
@@ -245,7 +254,7 @@ class PermissionTreeUtil:
             name += content_types_name_mapper[ct]
         else:
             name = gettext(p.name)
-            name = name.replace('Can ', '').replace('可以', '').replace('管理', '')
+            name = name.replace('Can ', '').replace('可以', '')
         return name
 
     def _create_perms_nodes(self):

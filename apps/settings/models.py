@@ -146,7 +146,7 @@ class Setting(models.Model):
             ('change_clean', _('Can change clean setting')),
             ('change_other', _('Can change other setting')),
             # 比较特殊
-            ('change_terminal_setting', _('Can change terminal setting')),
+            ('change_terminal_setting', _('Can change terminal basic setting')),
         ]
         db_table = "settings_setting"
         verbose_name = _("System setting")

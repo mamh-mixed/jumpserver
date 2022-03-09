@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-08 21:04+0800\n"
+"POT-Creation-Date: 2022-03-09 10:12+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1343,7 +1343,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:227 users/templates/users/user_asset_permission.html:128
+#: rbac/tree.py:228 users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
 msgstr "删除"
@@ -1397,11 +1397,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:224
+#: rbac/tree.py:225
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:226 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:227 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -2856,7 +2856,7 @@ msgstr "当前组织 ({}) 不能被删除"
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
-#: orgs/apps.py:7 rbac/tree.py:97
+#: orgs/apps.py:7 rbac/tree.py:98
 msgid "App organizations"
 msgstr "组织管理"
 
@@ -3281,15 +3281,15 @@ msgstr "我的资产"
 msgid "My apps"
 msgstr "我的应用"
 
-#: rbac/tree.py:98
+#: rbac/tree.py:99
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:99 terminal/apps.py:9
+#: rbac/tree.py:100 terminal/apps.py:9
 msgid "Terminals"
 msgstr "终端管理"
 
-#: rbac/tree.py:225
+#: rbac/tree.py:226
 msgid "View"
 msgstr "查看"
 
@@ -3347,21 +3347,21 @@ msgstr "认证设置"
 msgid "Can change sms setting"
 msgstr "短信设置"
 
-#: settings/models.py:146
-msgid "Can change terminal setting"
-msgstr "终端设置"
-
-#: settings/models.py:147
+#: settings/models.py:145
 msgid "Can change security setting"
 msgstr "安全设置"
 
-#: settings/models.py:148
+#: settings/models.py:146
 msgid "Can change clean setting"
 msgstr "定期清理"
 
-#: settings/models.py:149
+#: settings/models.py:147
 msgid "Can change other setting"
 msgstr "其他设置"
+
+#: settings/models.py:149
+msgid "Can change terminal basic setting"
+msgstr "终端基本设置"
 
 #: settings/serializers/auth/base.py:10
 msgid "CAS Auth"

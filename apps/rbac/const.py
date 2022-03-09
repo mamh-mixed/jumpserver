@@ -59,8 +59,6 @@ exclude_permissions = (
     ('audits', 'passwordchangelog', 'add,change,delete', 'passwordchangelog'),
     ('audits', 'userloginlog', 'change,delete,change', 'userloginlog'),
     ('audits', 'ftplog', 'change,delete', 'ftplog'),
-    ('xpack', 'interface', '*', '*'),
-    ('xpack', 'license', '*', '*'),
     ('common', 'permission', 'add,delete,view,change', 'permission'),
     ('terminal', 'command', 'delete,change', 'command'),
     ('terminal', 'sessionjoinrecord', 'delete', 'sessionjoinrecord'),
@@ -69,6 +67,8 @@ exclude_permissions = (
     ('terminal', 'session', 'delete,change', 'command'),
     ('terminal', 'task', 'delete', 'task'),
     ('terminal', 'status', 'delete,add', 'status'),
+    ('xpack', 'license', 'delete,change', 'license'),
+    ('xpack', 'interface', 'delete,add', 'interface'),
 )
 
 
@@ -79,7 +79,6 @@ only_system_permissions = (
     ('rbac', 'rolebinding', '*', '*'),
     ('rbac', 'systemrolebinding', '*', '*'),
     ('orgs', 'organization', '*', '*'),
-    ('xpack', 'license', '*', '*'),
     ('settings', 'setting', '*', '*'),
     ('ops', 'task', 'view', 'taskmonitor'),
     ('terminal', 'terminal', '*', '*'),
@@ -88,6 +87,8 @@ only_system_permissions = (
     ('terminal', 'status', '*', '*'),
     ('terminal', 'task', '*', '*'),
     ('tickets', 'ticketflow', '*', '*'),
+    ('xpack', 'license', 'add,view', 'license'),
+    ('xpack', 'interface', 'change,view', 'interface'),
 )
 
 only_org_permissions = (
