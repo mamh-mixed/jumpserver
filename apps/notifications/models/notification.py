@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from common.db.models import JMSModel
 
@@ -20,6 +21,9 @@ class SystemMsgSubscription(JMSModel):
     receive_backends = models.JSONField(default=list)
 
     message_type_label = ''
+
+    class Meta:
+        verbose_name = _('System msg subscription')
 
     def __str__(self):
         return f'{self.message_type}'

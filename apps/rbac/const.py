@@ -19,7 +19,10 @@ exclude_permissions = (
     ('jms_oidc_rp', '*', '*', '*'),
     ('admin', '*', '*', '*'),
     ('sessions', '*', '*', '*'),
-    ('notifications', '*', '*', '*'),
+    ('notifications', 'sitemessage', '*', 'sitemessage'),
+    ('notifications', 'sitemessageusers', '*', 'sitemessageusers'),
+    ('notifications', 'usermsgsubscription', '*', 'usermsgsubscription'),
+    ('notifications', 'systemmsgsubscription', 'add,delete', 'systemmsgsubscription'),
     ('common', 'setting', '*', '*'),
 
     ('authentication', 'privatetoken', '*', '*'),

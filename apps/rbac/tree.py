@@ -79,6 +79,7 @@ special_pid_mapper = {
     'xpack.gatherusertaskexecution': 'gather_account_node',
     'xpack.license': 'view_setting',
     'xpack.interface': 'view_setting',
+    'notifications.systemmsgsubscription': 'view_setting',
     'orgs.organization': 'view_setting',
     'terminal.terminal': 'terminal_node',
     'terminal.commandstorage': 'terminal_node',
