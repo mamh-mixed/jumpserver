@@ -2,7 +2,7 @@
 #
 
 from django_filters import rest_framework as filters
-from django.db.models import F, Q
+from django.db.models import Q
 
 from common.drf.filters import BaseFilterSet
 from common.drf.api import JMSBulkModelViewSet
@@ -22,7 +22,7 @@ class AccountFilterSet(BaseFilterSet):
 
     class Meta:
         model = Account
-        fields = ['app', 'systemuser']
+        fields = ['app', 'systemuser', 'id']
 
     @property
     def qs(self):
