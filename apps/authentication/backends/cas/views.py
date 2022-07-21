@@ -1,4 +1,5 @@
 from acls.models import LoginACL
+from apps.authentication.mixins import AuthACLMixin
 from authentication import errors
 from common.utils import get_request_ip
 
@@ -7,23 +8,12 @@ from django_cas_ng.views import LoginView
 from django.utils.translation import ugettext as _
 from django.contrib.auth import logout as auth_logout
 
-def check_login_acl(request, user, ip):
-    # ACL 限制用户登录
-    is_allowed, limit_type = LoginACL.allow_user_to_login(user, ip)
-    if is_allowed:
-        return
-    if limit_type == 'ip':
-        raise errors.LoginIPNotAllowed(username=user.username, request=request)
-    elif limit_type == 'time':
-        raise errors.TimePeriodNotAllowed(
-            username=user.username, request=request)
 
-
-class CasAuthRequestView(LoginView):
+class CasAuthRequestView(LoginView, AuthACLMixin):
     def successful_login(self, request, next_page):
         ip = get_request_ip(request)
         try:
-            check_login_acl(request, request.user, ip)
+            self._check_login_acl(request.user, ip)
         except Exception as e:
             auth_logout(request)
             context = {
