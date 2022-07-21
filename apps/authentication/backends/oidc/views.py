@@ -15,11 +15,16 @@ from django.conf import settings
 from django.contrib import auth
 from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponseRedirect, QueryDict
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.utils.http import is_safe_url, urlencode
 from django.views.generic import View
+from django.contrib.auth import logout as auth_logout
+from django.utils.translation import ugettext as _
 
+from apps.authentication import mixins
+from apps.common.utils.common import get_request_ip
 from .utils import get_logger, build_absolute_uri
 
 
@@ -87,7 +92,7 @@ class OIDCAuthRequestView(View):
         return HttpResponseRedirect(redirect_url)
 
 
-class OIDCAuthCallbackView(View):
+class OIDCAuthCallbackView(View, mixins.AuthMixin):
     """ Allows to complete the authentication process.
 
     This view acts as the main endpoint to complete the authentication process involving the OIDC
@@ -153,6 +158,20 @@ class OIDCAuthCallbackView(View):
                     callback_params.get('session_state', None)
 
                 logger.debug(log_prompt.format('Redirect'))
+                ip = get_request_ip(request)
+                try:
+                    self._check_login_acl(request.user, ip)
+                except Exception as e:
+                    auth_logout(request)
+                    context = {
+                        'title': _('Authentication failed'),
+                        'message': _('Authentication failed (before login check failed): {}').format(e),
+                        'interval': 10,
+                        'redirect_url': reverse('authentication:login'),
+                        'auto_redirect': True,
+                    }
+                    return render(request, 'auth_fail_flash_message_standalone.html', context)
+                return self.redirect_to_guard_view()
                 return HttpResponseRedirect(
                     next_url or settings.AUTH_OPENID_AUTHENTICATION_REDIRECT_URI
                 )
