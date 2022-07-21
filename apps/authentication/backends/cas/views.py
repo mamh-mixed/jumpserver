@@ -1,4 +1,5 @@
 from acls.models import LoginACL
+from apps.authentication import mixins
 from apps.authentication.mixins import AuthACLMixin
 from authentication import errors
 from common.utils import get_request_ip
@@ -9,7 +10,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth import logout as auth_logout
 
 
-class CasAuthRequestView(LoginView, AuthACLMixin):
+class CasAuthRequestView(LoginView, mixins.AuthMixin):
     def successful_login(self, request, next_page):
         ip = get_request_ip(request)
         try:
@@ -24,4 +25,4 @@ class CasAuthRequestView(LoginView, AuthACLMixin):
                 'auto_redirect': True,
             }
             return render(request, 'auth_fail_flash_message_standalone.html', context)
-        return super().successful_login(request, next_page)
+        return self.redirect_to_guard_view()
