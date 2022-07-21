@@ -5,7 +5,7 @@ from common.utils import get_request_ip
 from django.shortcuts import render, reverse
 from django_cas_ng.views import LoginView
 from django.utils.translation import ugettext as _
-
+from django.contrib.auth import logout as auth_logout
 
 def check_login_acl(request, user, ip):
     # ACL 限制用户登录
@@ -25,6 +25,7 @@ class CasAuthRequestView(LoginView):
         try:
             check_login_acl(request, request.user, ip)
         except Exception as e:
+            auth_logout(request)
             context = {
                 'title': _('Authentication failed'),
                 'message': _('Authentication failed (before login check failed): {}').format(e),
