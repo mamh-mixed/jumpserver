@@ -8,6 +8,9 @@ from django.urls import reverse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseServerError
+from django.contrib.auth import logout as auth_logout
+from django.utils.translation import ugettext as _
+from django.shortcuts import render
 
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from onelogin.saml2.errors import OneLogin_Saml2_Error
@@ -16,9 +19,11 @@ from onelogin.saml2.idp_metadata_parser import (
     dict_deep_merge
 )
 
+from apps.authentication import mixins
+
 from .settings import JmsSaml2Settings
 
-from common.utils import get_logger
+from common.utils import get_logger, get_request_ip
 
 logger = get_logger(__file__)
 
@@ -236,7 +241,7 @@ class Saml2EndSessionView(View, PrepareRequestMixin):
         return HttpResponseRedirect(logout_url)
 
 
-class Saml2AuthCallbackView(View, PrepareRequestMixin):
+class Saml2AuthCallbackView(View, PrepareRequestMixin, mixins.AuthMixin):
 
     def post(self, request):
         log_prompt = "Process SAML2 POST requests: {}"
@@ -269,6 +274,20 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin):
         if user and user.is_valid:
             logger.debug(log_prompt.format('Login: {}'.format(user)))
             auth.login(self.request, user)
+            ip = get_request_ip(request)
+            try:
+                self._check_login_acl(request.user, ip)
+            except Exception as e:
+                auth_logout(request)
+                context = {
+                    'title': _('Authentication failed'),
+                    'message': _('Authentication failed (before login check failed): {}').format(e),
+                    'interval': 10,
+                    'redirect_url': reverse('authentication:login'),
+                    'auto_redirect': True,
+                }
+                return render(request, 'auth_fail_flash_message_standalone.html', context)
+            return self.redirect_to_guard_view()
 
         logger.debug(log_prompt.format('Redirect'))
         next_url = saml_instance.redirect_to(post_data.get('RelayState', '/'))
