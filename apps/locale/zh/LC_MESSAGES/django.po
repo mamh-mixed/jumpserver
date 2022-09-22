@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-15 15:52+0800\n"
+"POT-Creation-Date: 2022-09-22 16:04+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -4730,11 +4730,17 @@ msgstr "Windows 远程应用发布服务器工具"
 
 #: templates/resource_download.html:43
 msgid ""
+"OpenSSH is a program used to connect remote applications in the Windows "
+"Remote Application Publisher"
+msgstr "OpenSSH 是在 windows 远程应用发布服务器中用来连接远程应用的程序"
+
+#: templates/resource_download.html:48
+msgid ""
 "Jmservisor is the program used to pull up remote applications in Windows "
 "Remote Application publisher"
 msgstr "Jmservisor 是在 windows 远程应用发布服务器中用来拉起远程应用的程序"
 
-#: templates/resource_download.html:51
+#: templates/resource_download.html:57
 msgid "Offline video player"
 msgstr "离线录像播放器"
 

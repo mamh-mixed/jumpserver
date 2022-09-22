@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-15 15:52+0800\n"
+"POT-Creation-Date: 2022-09-22 16:04+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4805,13 +4805,21 @@ msgstr "Windowsリモートアプリケーション発行者ツール"
 
 #: templates/resource_download.html:43
 msgid ""
+"OpenSSH is a program used to connect remote applications in the Windows "
+"Remote Application Publisher"
+msgstr ""
+"OpenSSHはリモートアプリケーションをWindowsリモートアプリケーションで接続する"
+"プログラムです"
+
+#: templates/resource_download.html:48
+msgid ""
 "Jmservisor is the program used to pull up remote applications in Windows "
 "Remote Application publisher"
 msgstr ""
 "Jmservisorはwindowsリモートアプリケーションパブリケーションサーバでリモートア"
 "プリケーションを引き出すためのプログラムです"
 
-#: templates/resource_download.html:51
+#: templates/resource_download.html:57
 msgid "Offline video player"
 msgstr "オフラインビデオプレーヤー"
 
