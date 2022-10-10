@@ -76,12 +76,26 @@ def migrate_gateway_to_asset(apps, schema_editor):
             accounts.append(_create_account_obj(
                 private_key, 'ssh_key', gateway, asset, account_model
             ))
-    account_model.objects.using(db_alias).bulk_create(accounts)
+    accounts = account_model.objects.using(db_alias).bulk_create(accounts)
+
+    print('>>> migrate account to  history account')
+    history_account_model = apps.get_model('assets', 'HistoricalAccount')
+    history_accounts = []
+    for account in accounts:
+        data = {
+            'id': account.id,
+            'secret': account.secret,
+            'secret_type': account.secret_type,
+            'history_date': account.date_created,
+        }
+        history_accounts.append(history_account_model(**data))
+    history_account_model.objects.using(db_alias).bulk_create(history_accounts)
+
 
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('assets', '0106_auto_20220916_1556'),
+        ('assets', '0107_account_history'),
     ]
 
     operations = [

@@ -60,15 +60,12 @@ user_permission_urlpatterns = [
     path('nodes/favorite/assets/', api.MyFavoriteGrantedAssetsApi.as_view(), name='my-ungrouped-assets'),
     # v3 中上面的 API 基本不用动
 
-    # Todo: v3 删除
-    # Asset System users
-    path('<uuid:pk>/assets/<uuid:asset_id>/system-users/', api.UserGrantedAssetSystemUsersForAdminApi.as_view(), name='user-asset-system-users'),
-    path('assets/<uuid:asset_id>/system-users/', api.MyGrantedAssetSystemUsersApi.as_view(), name='my-asset-system-users'),
-
-    # Todo: v3 增加
     # 获取所有和资产-用户关联的账号列表
-    path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGrantedAssetAccounts.as_view(), name='user-asset-accounts'),
-    path('assets/<uuid:asset_id>/accounts/', api.MyGrantedAssetAccounts.as_view(), name='my-asset-accounts')
+    path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGrantedAssetAccountsApi.as_view(), name='user-asset-accounts'),
+    path('assets/<uuid:asset_id>/accounts/', api.MyGrantedAssetAccountsApi.as_view(), name='my-asset-accounts'),
+    # 用户登录资产的特殊账号, @INPUT, @USER 等
+    path('<uuid:pk>/assets/special-accounts/', api.UserGrantedAssetSpecialAccountsApi.as_view(), name='user-special-accounts'),
+    path('/assets/special-accounts/', api.MyGrantedAssetSpecialAccountsApi.as_view(), name='my-special-accounts'),
 ]
 
 user_group_permission_urlpatterns = [
@@ -79,11 +76,8 @@ user_group_permission_urlpatterns = [
     path('<uuid:pk>/nodes/children/tree/', api.UserGroupGrantedNodeChildrenAsTreeApi.as_view(), name='user-group-nodes-children-as-tree'),
     path('<uuid:pk>/nodes/<uuid:node_id>/assets/', api.UserGroupGrantedNodeAssetsApi.as_view(), name='user-group-node-assets'),
 
-    # Todo: v3 删除
-    path('<uuid:pk>/assets/<uuid:asset_id>/system-users/', api.UserGroupGrantedAssetSystemUsersApi.as_view(), name='user-group-asset-system-users'),
-    # Todo: v3 增加
     # 获取所有和资产-用户组关联的账号列表
-    path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGrantedAssetAccounts.as_view(), name='user-asset-accounts'),
+    path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGroupGrantedAssetAccountsApi.as_view(), name='user-group-asset-accounts'),
 ]
 
 permission_urlpatterns = [
@@ -92,7 +86,7 @@ permission_urlpatterns = [
     path('<uuid:pk>/users/all/', api.AssetPermissionAllUserListApi.as_view(), name='asset-permission-all-users'),
 
     # 验证用户是否有某个资产和系统用户的权限
-    # Todo: API 需要修改，验证用户有某个账号的权限
+    # Todo: v3 先不动, 可能会修改连接资产时的逻辑, 直接获取认证信息，获取不到就时没有权限，就不需要校验了
     path('user/validate/', api.ValidateUserAssetPermissionApi.as_view(), name='validate-user-asset-permission'),
     path('user/actions/', api.GetUserAssetPermissionActionsApi.as_view(), name='get-user-asset-permission-actions'),
 

@@ -26,12 +26,12 @@ from perms.models import AssetPermission, Action
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserGrantedAssetSystemUsersForAdminApi',
     'ValidateUserAssetPermissionApi',
     'GetUserAssetPermissionActionsApi',
-    'MyGrantedAssetSystemUsersApi',
-    'UserGrantedAssetAccounts',
-    'MyGrantedAssetAccounts',
+    'UserGrantedAssetAccountsApi',
+    'MyGrantedAssetAccountsApi',
+    'UserGrantedAssetSpecialAccountsApi',
+    'MyGrantedAssetSpecialAccountsApi',
 ]
 
 
@@ -99,51 +99,7 @@ class ValidateUserAssetPermissionApi(APIView):
         return Response(data, status=status_code)
 
 
-class UserGrantedAssetSystemUsersForAdminApi(ListAPIView):
-    rbac_perms = {
-        'list': 'perms.view_userassets'
-    }
-
-    @lazyproperty
-    def user(self):
-        user_id = self.kwargs.get('pk')
-        return User.objects.get(id=user_id)
-
-    @lazyproperty
-    def system_users_with_actions(self):
-        asset_id = self.kwargs.get('asset_id')
-        asset = get_object_or_404(Asset, id=asset_id, is_active=True)
-        return self.get_asset_system_user_ids_with_actions(asset)
-
-    def get_asset_system_user_ids_with_actions(self, asset):
-        return get_asset_system_user_ids_with_actions_by_user(self.user, asset)
-
-    def paginate_queryset(self, queryset):
-        page = super().paginate_queryset(queryset)
-
-        if page:
-            page = self.set_systemusers_action(page)
-        else:
-            self.set_systemusers_action(queryset)
-        return page
-
-    def set_systemusers_action(self, queryset):
-        queryset_list = list(queryset)
-        for system_user in queryset_list:
-            actions = self.system_users_with_actions.get(system_user.id, 0)
-            system_user.actions = actions
-        return queryset_list
-
-
-class MyGrantedAssetSystemUsersApi(UserGrantedAssetSystemUsersForAdminApi):
-    permission_classes = (IsValidUser,)
-
-    @lazyproperty
-    def user(self):
-        return self.request.user
-
-
-class UserGrantedAssetAccounts(ListAPIView):
+class UserGrantedAssetAccountsApi(ListAPIView):
     serializer_class = serializers.AccountsGrantedSerializer
     rbac_perms = {
         'list': 'perms.view_userassets'
@@ -162,22 +118,40 @@ class UserGrantedAssetAccounts(ListAPIView):
         return asset
 
     def get_queryset(self):
-        accounts = AssetPermission.get_user_perm_asset_accounts(
-            self.user, self.asset, with_actions=True
-        )
+        accounts = AssetPermission.get_perm_asset_accounts(user=self.user, asset=self.asset)
         return accounts
-        # @INPUT @USER
-        # inner_accounts = [
-        #     Account.get_input_account(), Account.get_user_account(self.user.username)
-        # ]
-        # for inner_account in inner_accounts:
-        #     inner_account.actions = Action.ALL
-        # accounts = accounts + inner_accounts
+
+
+class MyGrantedAssetAccountsApi(UserGrantedAssetAccountsApi):
+    permission_classes = (IsValidUser,)
+
+    @lazyproperty
+    def user(self):
+        return self.request.user
+
+
+class UserGrantedAssetSpecialAccountsApi(ListAPIView):
+    serializer_class = serializers.AccountsGrantedSerializer
+    rbac_perms = {
+        'list': 'perms.view_userassets'
+    }
+
+    @lazyproperty
+    def user(self):
+        return self.request.user
+
+    def get_queryset(self):
         # 构造默认包含的账号，如: @INPUT @USER
-        # return accounts
+        accounts = [
+            Account.get_input_account(),
+            Account.get_user_account(self.user.username)
+        ]
+        for account in accounts:
+            account.actions = Action.ALL
+        return accounts
 
 
-class MyGrantedAssetAccounts(UserGrantedAssetAccounts):
+class MyGrantedAssetSpecialAccountsApi(UserGrantedAssetSpecialAccountsApi):
     permission_classes = (IsValidUser,)
 
     @lazyproperty
