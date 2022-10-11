@@ -5,7 +5,7 @@ from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from authentication.models import ConnectionToken
 from common.utils import pretty_string
 from common.utils.random import random_string
-from assets.models import Asset, Gateway, Domain, CommandFilterRule
+from assets.models import Asset, Domain, CommandFilterRule
 from users.models import User
 from perms.serializers.permission import ActionsField
 
@@ -119,13 +119,13 @@ class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Asset
-        fields = ['id', 'name', 'ip', 'protocols', 'org_id']
+        fields = ['id', 'name', 'address', 'protocols', 'org_id']
 
 
 class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Gateway
-        fields = ['id', 'ip', 'port', 'username', 'password', 'private_key']
+        model = Asset
+        fields = ['id', 'address', 'port', 'username', 'password', 'private_key']
 
 
 class ConnectionTokenRemoteAppSerializer(serializers.Serializer):

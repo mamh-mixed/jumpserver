@@ -1,5 +1,7 @@
 from .base import BaseType
 
+GATEWAY_NAME = 'Gateway'
+
 
 class HostTypes(BaseType):
     LINUX = 'linux', 'Linux'
@@ -32,7 +34,7 @@ class HostTypes(BaseType):
     def _get_protocol_constrains(cls) -> dict:
         return {
             '*': {
-               'choices': ['ssh', 'telnet', 'vnc', 'rdp']
+                'choices': ['ssh', 'telnet', 'vnc', 'rdp']
             }
         }
 

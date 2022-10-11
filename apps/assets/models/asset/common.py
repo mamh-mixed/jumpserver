@@ -14,6 +14,7 @@ from common.utils import lazyproperty
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
 from ..platform import Platform
 from ..base import AbsConnectivity
+from ..domain import GatewayMixin
 
 __all__ = ['Asset', 'AssetQuerySet', 'default_node', 'Protocol']
 logger = logging.getLogger(__name__)
@@ -86,7 +87,7 @@ class Protocol(models.Model):
         return '{}/{}'.format(self.name, self.port)
 
 
-class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
+class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel, GatewayMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     address = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)

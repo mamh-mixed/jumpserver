@@ -10,7 +10,7 @@ from common.mixins.api import SuggestionMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from assets import serializers
-from assets.models import Asset, Gateway
+from assets.models import Asset
 from assets.tasks import (
     update_assets_hardware_info_manual, test_assets_connectivity_manual,
 )
@@ -69,7 +69,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     def gateways(self, *args, **kwargs):
         asset = self.get_object()
         if not asset.domain:
-            gateways = Gateway.objects.none()
+            gateways = Asset.objects.none()
         else:
             gateways = asset.domain.gateways.filter(protocol='ssh')
         return self.get_paginated_response_from_queryset(gateways)

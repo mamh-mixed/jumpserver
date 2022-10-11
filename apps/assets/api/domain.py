@@ -7,9 +7,9 @@ from rest_framework.serializers import ValidationError
 
 from common.utils import get_logger
 from orgs.mixins.api import OrgBulkModelViewSet
-from ..models import Domain, Gateway
+from ..models import Domain, Asset
 from .. import serializers
-
+from ..const.host import GATEWAY_NAME
 
 logger = get_logger(__file__)
 __all__ = ['DomainViewSet', 'GatewayViewSet', "GatewayTestConnectionApi"]
@@ -17,11 +17,11 @@ __all__ = ['DomainViewSet', 'GatewayViewSet', "GatewayTestConnectionApi"]
 
 class DomainViewSet(OrgBulkModelViewSet):
     model = Domain
-    filterset_fields = ("name", )
+    filterset_fields = ("name",)
     search_fields = filterset_fields
     serializer_class = serializers.DomainSerializer
     ordering_fields = ('name',)
-    ordering = ('name', )
+    ordering = ('name',)
 
     def get_serializer_class(self):
         if self.request.query_params.get('gateway'):
@@ -30,21 +30,26 @@ class DomainViewSet(OrgBulkModelViewSet):
 
 
 class GatewayViewSet(OrgBulkModelViewSet):
-    model = Gateway
-    filterset_fields = ("domain__name", "name", "username", "domain")
-    search_fields = ("domain__name", "name", "username", )
+    filterset_fields = ("domain__name", "name", "domain")
+    search_fields = ("domain__name",)
     serializer_class = serializers.GatewaySerializer
+
+    def get_queryset(self):
+        queryset = Asset.objects.filter(platform__name=GATEWAY_NAME)
+        return queryset
 
 
 class GatewayTestConnectionApi(SingleObjectMixin, APIView):
-    queryset = Gateway.objects.all()
-    object = None
     rbac_perms = {
         'POST': 'assets.test_gateway'
     }
 
+    def get_queryset(self):
+        queryset = Asset.objects.filter(platform__name=GATEWAY_NAME)
+        return queryset
+
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object(Gateway.objects.all())
+        self.object = self.get_object()
         local_port = self.request.data.get('port') or self.object.port
         try:
             local_port = int(local_port)

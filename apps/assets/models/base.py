@@ -3,23 +3,23 @@
 import io
 import os
 import uuid
+import sshpubkeys
 from hashlib import md5
 
-import sshpubkeys
-from django.core.cache import cache
 from django.db import models
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.utils import timezone
 from django.db.models import QuerySet
+from django.utils.translation import ugettext_lazy as _
 
+from common.db import fields
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger,
     random_string, ssh_pubkey_gen,
 )
-from common.db import fields
 from orgs.mixins.models import OrgModelMixin
 
+from ..const import SecretType
 
 logger = get_logger(__file__)
 
@@ -54,51 +54,12 @@ class AbsConnectivity(models.Model):
         abstract = True
 
 
-class BaseAccount(OrgModelMixin):
-    class SecretType(models.TextChoices):
-        password = 'password', _('Password')
-        ssh_key = 'ssh_key', _('SSH key')
-        access_key = 'access_key', _('Access key')
-        token = 'token', _('Token')
-
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, verbose_name=_("Name"))
-    username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
-    secret_type = models.CharField(max_length=16, choices=SecretType.choices, default='password', verbose_name=_('Secret type'))
-    secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
-    privileged = models.BooleanField(verbose_name=_("Privileged"), default=False)
-    comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
-    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
-    created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
-
-    @property
-    def has_secret(self):
-        return bool(self.secret)
-
-    @property
-    def password(self):
-        return self.secret
-
-    @password.setter
-    def password(self, value):
-        self.secret = value
-        self.secret_type = 'password'
-
-    @property
-    def private_key(self):
-        if self.secret_type == self.SecretType.ssh_key:
-            return self.secret
-        return None
-
-    @property
-    def public_key(self):
-        return ''
-
-    @private_key.setter
-    def private_key(self, value):
-        self.secret = value
-        self.secret_type = 'private_key'
+class AuthMixin:
+    secret: str
+    password: str
+    public_key: str
+    secret_type: str
+    private_key: str
 
     @property
     def ssh_key_fingerprint(self):
@@ -126,7 +87,7 @@ class BaseAccount(OrgModelMixin):
 
     @property
     def private_key_path(self):
-        if not self.secret_type != 'ssh_key' or not self.secret:
+        if not self.secret_type != SecretType.ssh_key or not self.secret:
             return None
         project_dir = settings.PROJECT_DIR
         tmp_dir = os.path.join(project_dir, 'tmp')
@@ -163,6 +124,73 @@ class BaseAccount(OrgModelMixin):
         private_key, public_key = ssh_key_gen(username=username)
         return private_key, public_key
 
+
+class BaseAccount(AuthMixin, OrgModelMixin):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    name = models.CharField(max_length=128, verbose_name=_("Name"))
+    username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
+    secret_type = models.CharField(
+        max_length=16, choices=SecretType.choices, default='password', verbose_name=_('Secret type')
+    )
+    secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
+    privileged = models.BooleanField(verbose_name=_("Privileged"), default=False)
+    comment = models.TextField(blank=True, verbose_name=_('Comment'))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
+    created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
+
+    @property
+    def has_secret(self):
+        return bool(self.secret)
+
+    @property
+    def password(self):
+        if self.secret_type == SecretType.password:
+            return self.secret
+        return None
+
+    @password.setter
+    def password(self, value):
+        self.secret = value
+        self.secret_type = SecretType.password
+
+    @property
+    def private_key(self):
+        if self.secret_type == SecretType.ssh_key:
+            return self.secret
+        return None
+
+    @private_key.setter
+    def private_key(self, value):
+        self.secret = value
+        self.secret_type = SecretType.ssh_key
+
+    @property
+    def public_key(self):
+        return ''
+
+    @property
+    def token(self):
+        if self.secret_type == SecretType.token:
+            return self.secret
+        return None
+
+    @token.setter
+    def token(self, value):
+        self.secret = value
+        self.secret_type = SecretType.token
+
+    @property
+    def access_key(self):
+        if self.secret_type == SecretType.access_key:
+            return self.secret
+        return None
+
+    @access_key.setter
+    def access_key(self, value):
+        self.secret = value
+        self.secret_type = SecretType.access_key
+
     def _to_secret_json(self):
         """Push system user use it"""
         return {
@@ -170,10 +198,10 @@ class BaseAccount(OrgModelMixin):
             'username': self.username,
             'password': self.password,
             'public_key': self.public_key,
-            'private_key': self.private_key_file,
+            'private_key': self.private_key_path,
+            'access_key': self.access_key,
             'token': self.token
         }
 
     class Meta:
         abstract = True
-
