@@ -35,14 +35,17 @@ class OrgRelatedCache(Cache):
         """
         在事务提交之后再发送信号，防止因事务的隔离性导致未获得最新的数据
         """
+
         def func():
             logger.debug(f'CACHE: Send refresh task {self}.{fields}')
             refresh_org_cache_task.delay(self, *fields)
+
         on_commit(func)
 
     def expire(self, *fields):
         def func():
             super(OrgRelatedCache, self).expire(*fields)
+
         on_commit(func)
 
 
@@ -54,7 +57,6 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
     nodes_amount = IntegerField(queryset=Node.objects)
     accounts_amount = IntegerField(queryset=Account.objects)
     domains_amount = IntegerField(queryset=Domain.objects)
-    # gateways_amount = IntegerField(queryset=Gateway.objects)
     asset_perms_amount = IntegerField(queryset=AssetPermission.objects)
 
     total_count_online_users = IntegerField()
@@ -80,8 +82,10 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
         node = Node.org_root()
         return node.assets_amount
 
-    def compute_total_count_online_users(self):
+    @staticmethod
+    def compute_total_count_online_users():
         return Session.objects.filter(is_finished=False).values_list('user_id').distinct().count()
 
-    def compute_total_count_online_sessions(self):
+    @staticmethod
+    def compute_total_count_online_sessions():
         return Session.objects.filter(is_finished=False).count()

@@ -113,4 +113,5 @@ class Migration(migrations.Migration):
             },
             bases=('assets.baseautomation',),
         ),
+
     ]
