@@ -103,7 +103,7 @@ def ssh_private_key_gen(private_key, password=None):
 
 def ssh_pubkey_gen(private_key=None, username='jumpserver', hostname='localhost', password=None):
     private_key = ssh_private_key_gen(private_key, password=password)
-    if not isinstance(private_key, (paramiko.RSAKey, paramiko.DSSKey)):
+    if not isinstance(private_key, (paramiko.RSAKey, paramiko.DSSKey, paramiko.Ed25519Key)):
         raise IOError('Invalid private key')
 
     public_key = "%(key_type)s %(key_content)s %(username)s@%(hostname)s" % {
