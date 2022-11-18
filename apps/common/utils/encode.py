@@ -1,24 +1,22 @@
 # -*- coding: utf-8 -*-
 #
-import re
-import json
-from six import string_types
 import base64
-import os
-import time
 import hashlib
+import json
+import os
+import re
+import time
 from io import StringIO
-from itertools import chain
 
 import paramiko
 import sshpubkeys
+from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
 from itsdangerous import (
     TimedJSONWebSignatureSerializer, JSONWebSignatureSerializer,
     BadSignature, SignatureExpired
 )
-from django.conf import settings
-from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models.fields.files import FileField
+from six import string_types
 
 from .http import http_date
 
@@ -85,6 +83,13 @@ def ssh_key_string_to_obj(text, password=None):
     else:
         return key
 
+    try:
+        key = paramiko.Ed25519Key.from_private_key(StringIO(text), password=password)
+    except paramiko.SSHException:
+        pass
+    else:
+        return key
+
     return key
 
 
@@ -137,17 +142,52 @@ def ssh_key_gen(length=2048, type='rsa', password=None, username='jumpserver', h
 
 
 def validate_ssh_private_key(text, password=None):
-    if isinstance(text, bytes):
+    if isinstance(text, str):
         try:
-            text = text.decode("utf-8")
+            text = text.encode("utf-8")
         except UnicodeDecodeError:
             return False
 
-    key = ssh_key_string_to_obj(text, password=password)
+    key = parse_ssh_private_key(text, password=password)
     if key is None:
         return False
     else:
         return True
+
+
+def parse_ssh_private_key(text: bytes, password=None) -> str:
+    if isinstance(text, str):
+        try:
+            text = text.encode("utf-8")
+        except UnicodeDecodeError:
+            return ""
+    from cryptography.hazmat.primitives import serialization
+    try:
+        private_key = serialization.load_ssh_private_key(text, password=password)
+        private_key_bytes = private_key.private_bytes(serialization.Encoding.PEM,
+                                                      serialization.PrivateFormat.OpenSSH,
+                                                      serialization.NoEncryption())
+        return private_key_bytes.decode('utf-8')
+    except (ValueError, TypeError, UnicodeDecodeError) as e:
+        pass
+    return ""
+
+
+def parse_ssh_public_key(private_key: bytes = "", password=None) -> str:
+    if isinstance(private_key, str):
+        try:
+            text = private_key.encode("utf-8")
+        except UnicodeDecodeError:
+            return ""
+    from cryptography.hazmat.primitives import serialization
+    try:
+        private_key = serialization.load_ssh_private_key(private_key, password=password)
+        public_key_bytes = private_key.public_key().public_bytes(serialization.Encoding.OpenSSH,
+                                                                 serialization.PublicFormat.OpenSSH)
+        return public_key_bytes.decode('utf-8')
+    except (ValueError, TypeError, UnicodeDecodeError) as e:
+        pass
+    return ""
 
 
 def validate_ssh_public_key(text):
