@@ -18,7 +18,7 @@ from common.utils import random_string
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger, lazyproperty
 )
-from common.utils.encode import parse_ssh_public_key
+from common.utils.encode import parse_ssh_public_key_str
 from orgs.mixins.models import OrgModelMixin
 
 logger = get_logger(__file__)
@@ -66,7 +66,7 @@ class AuthMixin:
             public_key = self.public_key
         elif self.private_key:
             try:
-                public_key = parse_ssh_public_key(private_key=self.private_key, password=self.password)
+                public_key = parse_ssh_public_key_str(private_key=self.private_key, password=self.password)
             except IOError as e:
                 return str(e)
         else:
