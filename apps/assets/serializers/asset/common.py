@@ -254,8 +254,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         self._set_protocols_default()
         return super().is_valid(raise_exception)
 
-    def validate_protocols(self, protocols_data):
+    def validate_protocols(self, *args):
         # 目的是去重
+        protocols_data = self.initial_data.get('protocols', [])
         protocols_data_map = {p['name']: p for p in protocols_data}
         for p in protocols_data:
             port = p.get('port', 0)
@@ -266,9 +267,21 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         protocols_required, protocols_default = self._get_protocols_required_default()
         protocols_not_found = [p.name for p in protocols_required if p.name not in protocols_data_map]
         if protocols_not_found:
-            raise serializers.ValidationError({
-                'protocols': _("Protocol is required: {}").format(', '.join(protocols_not_found))
-            })
+            raise serializers.ValidationError(_("Protocol is required: {}").format(', '.join(protocols_not_found)))
+
+        # 检查一下，是不是写了别的资产的 protocol id
+        protocol_ids = [p['id'] for p in protocols_data if p.get('id')]
+        if not protocol_ids:
+            return protocols_data_map.values()
+
+        if not self.instance:
+            raise serializers.ValidationError(_("Protocol id is not allowed when create"))
+
+        protocols_has_set = Protocol.objects.filter(id__in=protocol_ids) \
+            .exclude(asset=self.instance) \
+            .values_list('id', flat=True)
+        if protocols_has_set:
+            raise serializers.ValidationError(_("id has set on others: {}").format(list(protocols_has_set)))
         return protocols_data_map.values()
 
     @staticmethod
