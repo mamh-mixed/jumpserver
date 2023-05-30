@@ -11,7 +11,6 @@ for (let i = 0; i < links.length; i++) {
 
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
-        console.log(request.url);
         $("iframe").attr("src", request.url);
         sendResponse({farewell: "goodbye"});
     }
